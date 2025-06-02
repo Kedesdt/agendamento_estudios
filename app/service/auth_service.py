@@ -1,10 +1,12 @@
 from flask import request, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 # Configurando o gerenciador de login
 login_manager = LoginManager()
-login_manager.login_view = 'login'
+login_manager.login_view = "login"
+
 
 # Modelo de usuário (simplificado)
 class User(UserMixin):
@@ -16,14 +18,17 @@ class User(UserMixin):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+
 # Simulando um banco de dados de usuários
 users = {
-    "admin": User(1, "admin", "senha123")
+    "admin": User(1, "admin", os.environ.get("ADMIN_PASSWORD", "admin123")),
 }
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return next((user for user in users.values() if str(user.id) == user_id), None)
+
 
 # Função de autenticação
 def authenticate(username, password):
@@ -33,9 +38,11 @@ def authenticate(username, password):
         return True
     return False
 
+
 # Função de logout
 def logout():
     logout_user()
+
 
 # Exemplo de rota protegida
 @login_required

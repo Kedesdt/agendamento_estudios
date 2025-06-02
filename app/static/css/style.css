@@ -1,0 +1,65 @@
+.body-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+}
+
+.card_day {
+  background-color: #f3f3f3;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 5px;
+  margin: 2px;
+  height: calc(100% - 15px);
+}
+.card_day:hover {
+  background-color: #aca78c;
+  cursor: pointer;
+}
+.card_day-active {
+  background-color: #5c78c5;
+  border: 1px solid #ccc;
+
+}
+.calendario{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+.calendario-table {
+    width: 100%;
+    height: 100%;
+}
+.calendario-header {
+    /*display: flex;*/
+    height: 25px;
+    background-color: #2e3d68;
+    color: white;
+    border: 0px solid #ccc;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-weight: bold;
+}
+.calendario-header-mes {
+    /*display: flex;*/
+    height: 50px;
+    background-color: #5c78c5;
+}
+th a {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    text-decoration: none;
+    text-align: center; /* Centraliza o texto */
+    vertical-align: bottom;
+    align-items: center;
+
+}
