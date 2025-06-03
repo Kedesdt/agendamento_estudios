@@ -27,7 +27,7 @@
                         <td>
                             {% set dia = i * 7 + j %}
                             {% set data = (data_inicial + timedelta(days=dia)).strftime('%d') %}
-                            <div class="card_day">
+                            <div class={% if data == hoje %}"card_day card_day-active"{% else %}"card_day"{% endif %}>
                                 <span class="card-day">{{ data }}</span>
                                 {% for agendamento in agendamentos %}
                                     {% if agendamento.data.strftime('%d') == data %}
@@ -39,7 +39,7 @@
                                     {% endif %}
                                 {% endfor %}
                                 <div class="card_agendamento">
-                                    <a href="{{ url_for('agendar', data=data_inicial + timedelta(days=dia)) }}" class="card_agendamento-link">Agendar</a>
+                                    <a href="{{ url_for('agendar') }}" class="card_agendamento-link">Agendar</a>
                             </div>
                         </td>
                         

@@ -2,21 +2,26 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <meta http-equiv="refresh" content="600">
+        <meta http-equiv="refresh" content="50">
         <title>{% block title %}{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css')}}" />
     </head>
 
     <body>
         <div class="navbar">
-            <a href="{{ url_for('home') }}" class="navbar-brand">Home</a>
-            <a href="{{ url_for('home') }}" class="navbar-item">Agendar</a>
-            <a href="{{ url_for('add_estudio') }}" class="navbar-item">Add Estudio</a>
-            <a href="{{ url_for('login') }}" class="navbar-item">Login</a>
+            <a href="{{ url_for('home') }}" class="navbar-brand{% if request.endpoint == 'home' %} active{% endif %}">Home</a>
+            <a href="{{ url_for('agendar') }}" class="navbar-item{% if request.endpoint == 'agendar' %} active{% endif %}">Agendar</a>
+            <a href="{{ url_for('add_estudio') }}" class="navbar-item{% if request.endpoint == 'add_estudio' %} active{% endif %}">Add Estudio</a>
+            {% block login %}
+            {% endblock %}
+            
             
         </div>
 
         <div class="body-content">
+            {% if error %}
+            <p style="color: red; margin-top: 12px;">{{ error }}</p>
+            {% endif %}
             {% block content %}
             {% endblock %}
             <hr/>

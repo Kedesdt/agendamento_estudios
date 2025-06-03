@@ -1,16 +1,19 @@
 from app import app
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, url_for
 import time
 from datetime import datetime, timedelta
 from app.models.agendamento import Agendamento
 from app.models.estudio import Estudio
 from app.util.util import get_month_name
+from app.service.auth_service import current_user
 
 
 @app.route("/", methods=["GET", "POST"])
 def home():
 
-    estudio_id = request.form.get("estudio_id")
+    estudio_id = request.args.get("estudio_id")
+    ano = request.args.get("ano")
+    mes = request.args.get("mes")
     estudio = Estudio.get_studio_by_id(estudio_id)
 
     if estudio is None:
@@ -19,9 +22,17 @@ def home():
     estudios = Estudio.get_all_studios()
 
     hoje = datetime.now()
-    mes = hoje.month
-    ano = hoje.year
-    primeiro_dia_do_mes = hoje.replace(day=1)
+
+    if ano and mes:
+
+        ano = int(ano)
+        mes = int(mes)
+        primeiro_dia_do_mes = datetime(ano, mes, 1)
+    else:
+        mes = hoje.month
+        ano = hoje.year
+        primeiro_dia_do_mes = hoje.replace(day=1)
+
     ultimo_dia_do_mes = primeiro_dia_do_mes.replace(
         month=(primeiro_dia_do_mes.month % 12) + 1, day=1
     ) - timedelta(days=1)
@@ -56,7 +67,7 @@ def home():
         timedelta=timedelta,
         estudio=estudio,
         estudios=estudios,
-        hoje=hoje.day,
+        hoje=hoje.strftime("%m%d"),
         agendamentos=agendamentos,
         get_month_name=get_month_name,
         mes=mes,
@@ -65,19 +76,17 @@ def home():
         proximo_mes=proximo_mes,
         ano_anterior=ano_anterior,
         proximo_ano=proximo_ano,
+        current_user=current_user,
     )
 
 
 @app.route("/calendario/<int:estudio_id>/<int:mes>/<int:ano>", methods=["GET", "POST"])
 def calendario(mes, ano, estudio_id):
 
-    hoje = datetime.now()
-    if hoje.month == mes and hoje.year == ano:
-        return home()
-
+    estudio_id = request.form.get("estudio_id", None)
     estudio = Estudio.get_studio_by_id(estudio_id)
-        #if not estudio:
-        #    return estudio_name, 404
+
+    hoje = datetime.now()
 
     primeiro_dia_do_mes = datetime(ano, mes, 1)
     ultimo_dia_do_mes = primeiro_dia_do_mes.replace(
@@ -112,7 +121,7 @@ def calendario(mes, ano, estudio_id):
         data_inicial=domingo_anterior,
         timedelta=timedelta,
         estudio=estudio,
-        hoje=hoje.day,
+        hoje=hoje.strftime("%m%d"),
         agendamentos=agendamentos,
         get_month_name=get_month_name,
         mes=mes,
@@ -124,38 +133,63 @@ def calendario(mes, ano, estudio_id):
     )
 
 
+@app.route("/calendario/dia/<int:dia>/<int:mes>/<int:ano>", methods=["GET", "POST"])
+def calendario_dia(dia, mes, ano):
+
+    estudio_id = request.args.get("estudio_id", None)
+    estudio = Estudio.get_studio_by_id(estudio_id)
+
+    hoje = datetime.now()
+
+    data_escolhida = datetime(ano, mes, dia)
+
+    agendamentos = Agendamento.get_agendamentos_by_date_range(
+        datainicial=data_escolhida,
+        datafinal=data_escolhida + timedelta(days=1),
+    )
+
+    return render_template(
+        "calendario_dia.html",
+        data_escolhida=data_escolhida,
+        timedelta=timedelta,
+        estudio=estudio,
+        hoje=hoje.strftime("%m%d"),
+        agendamentos=agendamentos,
+    )
+
+
 @app.route("/agendar", methods=["GET", "POST"])
 def agendar():
-    estudio_id = request.args.get("estudio_id")
-    estudio = Estudio.get_studio_by_id(estudio_id)
-    if not estudio:
-        return "Estúdio não encontrado", 404
+
+    estudios = Estudio.get_all_studios()
+
     if request.method == "POST":
         data = request.form.get("data")
         hora_inicio = request.form.get("hora_inicio")
         hora_fim = request.form.get("hora_fim")
+        responsavel = request.form.get("responsavel", "Desconhecido")
+        estudio_id = request.form.get("estudio_id")
+        estudio = Estudio.get_studio_by_id(estudio_id)
 
         if not data or not hora_inicio or not hora_fim:
             return "Data e hora são obrigatórios", 400
         data_hora = f"{data} {hora_inicio}"
         data_hora_fim = f"{data} {hora_fim}"
 
-        duracao = (
-            datetime.strptime(data_hora_fim, "%Y-%m-%d %H:%M")
-            - datetime.strptime(data_hora, "%Y-%m-%d %H:%M")
-        ).total_seconds() / 60
-        
         agendamento = Agendamento(
             estudio_id=estudio.id,
             descricao=request.form.get("descricao", ""),
-            data_hora=datetime.strptime(data_hora, "%Y-%m-%d %H:%M"),
-            duracao=int(duracao),
+            data_hora_inicio=datetime.strptime(data_hora, "%Y-%m-%d %H:%M"),
+            data_hora_final=datetime.strptime(data_hora_fim, "%Y-%m-%d %H:%M"),
+            responsavel=responsavel,
         )
 
-        agendamento.save()
+        try:
+            agendamento.save()
+            return redirect(url_for("home"))
+        except ValueError as e:
+            error = str(e)
 
-        data_hora = datetime.strptime(data_hora, "%Y-%m-%d %H:%M")
-
-        return redirect(f"/calendario/{estudio.id}/{data_hora.month}/{data_hora.year}")
-
-    return render_template("agendar.html", estudio=estudio)
+    return render_template(
+        "agendar.html", estudios=estudios, error=error if "error" in locals() else None
+    )

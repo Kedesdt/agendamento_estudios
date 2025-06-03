@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Agendamentos do dia {{ data_escolhida.strftime('%d/%m/%Y') }}</h2>
+
+    <div class="dia-agendamentos">
+        {% if agendamentos|length == 0 %}
+            <div class="sem-agendamentos">
+                Nenhum agendamento para este dia.
+            </div>
+        {% else %}
+            {% for agendamento in agendamentos|sort(attribute='data_hora_inicio') %}
+                <div class="card_agendamento">
+                    <span class="card_agendamento-time">
+                        {{ agendamento.data_hora_inicio.strftime('%H:%M') }}
+                        - {{ agendamento.data_hora_final.strftime('%H:%M') }}
+                    </span>
+                    <span class="card_agendamento-studio">
+                        Estúdio: {{ agendamento.estudio.nome }}
+                    </span>
+                    <span class="card_agendamento-client">
+                        Responsável: {{ agendamento.responsavel }}
+                    </span>
+                    {% if agendamento.descricao %}
+                        <span class="card_agendamento-desc">
+                            {{ agendamento.descricao }}
+                        </span>
+                    {% endif %}
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('delete', agendamento_id=agendamento.id, next=request.full_path) }}" class="card_agendamento-link card_agendamento-link-red">Apagar</a>
+                
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('home') }}" class="card_agendamento-link" style="margin-top:20px;">Voltar ao calendário</a>
+{% endblock %}
+
+<style>
+
+</style>

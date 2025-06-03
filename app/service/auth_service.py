@@ -1,11 +1,20 @@
 from flask import request, redirect, url_for
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    logout_user,
+    login_required,
+    current_user,
+)
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 # Configurando o gerenciador de login
 login_manager = LoginManager()
 login_manager.login_view = "login"
+
+current_user = current_user  # Variável global para armazenar o usuário atual
 
 
 # Modelo de usuário (simplificado)

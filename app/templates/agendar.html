@@ -4,8 +4,14 @@
 
 {% block content %}
 <div class="agendar-container">
-    <h2>Agendar: {{ estudio.nome }}</h2>
-    <form method="post" action="{{ url_for('agendar') }}?estudio_id={{ estudio.id }}">
+    <h2>Agendar:</h2>
+    <form method="post" action="{{ url_for('agendar') }}">
+        <label for="estudio_id"><strong>Estúdio:</strong></label>
+        <select name="estudio_id" id="estudio_id">
+            {% for estudio in estudios %}
+                <option value="{{ estudio.id }}" {% if estudio.id|string == selected_estudio_id %}selected{% endif %}>{{ estudio.nome }}</option>
+            {% endfor %}
+        </select>
         <div>
             <label for="data">Data:</label>
             <input type="date" id="data" name="data" required>

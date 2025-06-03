@@ -1,65 +1,401 @@
-.body-content{
+/* Reset básico */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f6f8fa;
+    color: #222;
+}
+
+.body-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    min-height: 100vh;
     width: 100%;
-    height: 100vh;
+    padding: 30px 0;
+}
+
+h1, h2 {
+    color: #2e3d68;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+/* Estilo para a navbar */
+.dia-agendamentos {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 500px;
+    margin: 0 auto;
+    margin-top: 30px;
+}
+.sem-agendamentos {
+    background: #f3f3f3;
+    border: 1.5px solid #e0e4ea;
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    color: #888;
+    font-size: 1.1rem;
+}
+.card_agendamento-desc {
+    color: #444;
+    font-size: 0.97rem;
+    margin-top: 2px;
+}
+
+/* Estilo para o formulário de agendamento */
+.agendar-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(44, 62, 80, 0.10);
+    padding: 32px 28px 24px 28px;
+    max-width: 420px;
+    margin: 40px auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.agendar-container h2 {
+    color: #2e3d68;
+    margin-bottom: 22px;
+    text-align: center;
+}
+
+.agendar-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.agendar-container label {
+    font-weight: 600;
+    color: #5c78c5;
+    margin-bottom: 4px;
+}
+
+.agendar-container input[type="text"],
+.agendar-container input[type="date"],
+.agendar-container input[type="time"],
+.agendar-container input[type="password"],
+.agendar-container select,
+.agendar-container textarea {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1.2px solid #bfc9d1;
+    background: #f3f6fa;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+    margin-top: 2px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.agendar-container input:focus,
+.agendar-container select:focus,
+.agendar-container textarea:focus {
+    border: 1.5px solid #5c78c5;
+    background: #fff;
+}
+
+.agendar-container textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+.agendar-container button[type="submit"] {
+    margin-top: 10px;
+    padding: 10px 0;
+    background: #5c78c5;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.08rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.08);
+}
+
+.agendar-container button[type="submit"]:hover {
+    background: #2e3d68;
+}
+
+@media (max-width: 600px) {
+    .agendar-container {
+        padding: 12px 4px 12px 4px;
+        max-width: 98vw;
+    }
+}
+
+.navbar {
+    width: 100%;
+    background: linear-gradient(90deg, #5c78c5 0%, #2e3d68 100%);
+    padding: 0 0 0 0;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-height: 56px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-brand {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #fff;
+    padding: 0 24px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: color 0.2s;
+    margin-right: 18px;
+    line-height: 56px;
+}
+
+.navbar-item {
+    color: #eaf0fa;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 0 18px;
+    line-height: 56px;
+    border-radius: 0 0 8px 8px;
+    transition: background 0.2s, color 0.2s;
+    font-weight: 500;
+    position: relative;
+}
+
+.navbar-item:hover, .navbar-brand:hover {
+    background: #fff2;
+    color: #ffd700;
+}
+
+.navbar .navbar-item.active, .navbar .navbar-brand.active {
+    background: #fff;
+    color: #2e3d68;
+}
+
+@media (max-width: 700px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        min-height: unset;
+        padding: 0;
+    }
+    .navbar-brand, .navbar-item {
+        padding: 10px 18px;
+        line-height: 1.5;
+        width: 100%;
+    }
+}
+
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+    margin-bottom: 30px;
+}
+
+.filter-bar label {
+    font-weight: 600;
+    color: #5c78c5;
+}
+
+.filter-bar select {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #bfc9d1;
+    background: #f3f6fa;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+}
+.filter-bar select:focus {
+    border: 1.5px solid #5c78c5;
+}
+
+.calendario {
+    width: 100%;
+    min-width: 1260px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(44, 62, 80, 0.10);
+    padding: 30px 20px 20px 20px;
+    margin-bottom: 40px;
+}
+
+.calendario-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 6px;
+}
+
+.calendario-header-mes th {
+    background: #5c78c5;
+    color: #fff;
+    font-size: 1.2rem;
+    border-radius: 8px 8px 0 0;
+    height: 48px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.calendario-header th {
+    background: #2e3d68;
+    color: #fff;
+    font-weight: 600;
+    height: 32px;
+    text-align: center;
+    border-radius: 6px 6px 0 0;
+    font-size: 1rem;
+}
+
+th a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: color 0.2s;
+}
+th a:hover {
+    color: #ffd700;
 }
 
 .card_day {
-  background-color: #f3f3f3;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 5px;
-  margin: 2px;
-  height: calc(100% - 15px);
+    background: #f3f3f3;
+    border: 1.5px solid #e0e4ea;
+    border-radius: 10px;
+    padding: 8px 4px 4px 4px;
+    min-height: 160px;
+    min-width: 160px;
+    position: relative;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.04);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
 }
 .card_day:hover {
-  background-color: #aca78c;
-  cursor: pointer;
+    background: #e6eaf3;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.10);
+    cursor: pointer;
 }
 .card_day-active {
-  background-color: #5c78c5;
-  border: 1px solid #ccc;
+    background: #5c78c5;
+    color: #fff;
+    border: 2px solid #2e3d68;
+}
 
-}
-.calendario{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-}
-.calendario-table {
-    width: 100%;
-    height: 100%;
-}
-.calendario-header {
-    /*display: flex;*/
-    height: 25px;
-    background-color: #2e3d68;
-    color: white;
-    border: 0px solid #ccc;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
+.card-day {
     font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+    color: inherit;
 }
-.calendario-header-mes {
-    /*display: flex;*/
-    height: 50px;
-    background-color: #5c78c5;
-}
-th a {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    text-decoration: none;
-    text-align: center; /* Centraliza o texto */
-    vertical-align: bottom;
-    align-items: center;
 
+.card_agendamento {
+    background: #eaf0fa;
+    border-radius: 6px;
+    padding: 3px 7px;
+    margin-bottom: 2px;
+    font-size: 0.95rem;
+    color: #2e3d68;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    box-shadow: 0 1px 2px rgba(44, 62, 80, 0.04);
+}
+.card_day-active .card_agendamento {
+    background: #fff;
+    color: #2e3d68;
+}
+
+.card_agendamento-info {
+    display: block;
+    max-width: 0px;
+    max-height: 0px;
+    overflow: hidden;
+    white-space: nowrap;
+
+}
+.card_agendamento:hover .card_agendamento-info {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    transition-duration: 1000ms;
+}
+
+.card_agendamento-time {
+    font-weight: 600;
+    color: #5c78c5;
+    font-size: 0.98rem;
+}
+.card_agendamento-studio {
+    font-size: 0.93rem;
+    color: #2e3d68;
+}
+.card_agendamento-client {
+    font-size: 0.93rem;
+    color: #444;
+}
+
+.card_agendamento-link {
+    display: inline-block;
+    margin-top: auto;
+    padding: 3px 10px;
+    background: #5c78c5;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.2s;
+    font-weight: 500;
+    align-self: flex-end;
+    
+}
+
+.card_agendamento-link-red {
+
+    background: #cc2929; 
+}
+
+.card_agendamento-link:hover {
+    background: #2e3d68;
+}
+
+@media (max-width: 900px) {
+    .calendario {
+        padding: 10px 2px 10px 2px;
+        max-width: 100vw;
+    }
+    .calendario-table {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .calendario {
+        padding: 2px;
+    }
+    .calendario-table {
+        font-size: 0.85rem;
+    }
+    .filter-bar {
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 8px;
+    }
 }
