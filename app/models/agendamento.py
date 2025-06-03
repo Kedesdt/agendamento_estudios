@@ -10,13 +10,15 @@ class Agendamento(db.Model):
     duracao = db.Column(db.Integer, nullable=False)  # duração em minutos
     estudio_id = db.Column(db.Integer, db.ForeignKey("estudios.id"), nullable=False)
     estudio = db.relationship("Estudio", back_populates="agendamentos")
+    responsavel = db.Column(db.String(100), nullable=False)  # responsável pelo agendamento
     # relacionamento com a tabela Estudios
     descricao = db.Column(db.String(255), nullable=False)
 
     def __repr__(self):
         return f"<Agendamento {self.id} - {self.descricao} em {self.data_hora}>"
 
-    def __init__(self, data_hora, duracao, estudio_id, descricao):
+    def __init__(self, data_hora, duracao, estudio_id, descricao, responsavel="Desconhecido"):
+        self.responsavel = responsavel
         self.data_hora = data_hora
         self.duracao = duracao
         self.estudio_id = estudio_id

@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, request
+from flask import render_template, request, redirect
 import time
 from datetime import datetime, timedelta
 from app.models.agendamento import Agendamento
@@ -10,15 +10,13 @@ from app.util.util import get_month_name
 @app.route("/", methods=["GET", "POST"])
 def home():
 
-    estudio = None
-
-    if request.method == "POST":
-        estudio_id = request.form.get("estudio_id")
-        estudio = Estudio.get_studio_by_id(estudio_id)
-        estudios = [estudio]
+    estudio_id = request.form.get("estudio_id")
+    estudio = Estudio.get_studio_by_id(estudio_id)
 
     if estudio is None:
-        estudios = Estudio.get_all_studios()
+        estudio = Estudio.get_studio_by_id(1)
+
+    estudios = Estudio.get_all_studios()
 
     hoje = datetime.now()
     mes = hoje.month
@@ -56,6 +54,7 @@ def home():
         "home.html",
         data_inicial=domingo_anterior,
         timedelta=timedelta,
+        estudio=estudio,
         estudios=estudios,
         hoje=hoje.day,
         agendamentos=agendamentos,
@@ -69,12 +68,15 @@ def home():
     )
 
 
-@app.route("/calendario/<int:mes>/<int:ano>", methods=["GET", "POST"])
-def calendario(mes, ano, estudio_name=None):
-    if not estudio_name:
+@app.route("/calendario/<int:estudio_id>/<int:mes>/<int:ano>", methods=["GET", "POST"])
+def calendario(mes, ano, estudio_id):
 
-        estudio = Estudio.query.filter_by(nome=estudio_name).first()
-        # if not estudio:
+    hoje = datetime.now()
+    if hoje.month == mes and hoje.year == ano:
+        return home()
+
+    estudio = Estudio.get_studio_by_id(estudio_id)
+        #if not estudio:
         #    return estudio_name, 404
 
     primeiro_dia_do_mes = datetime(ano, mes, 1)
@@ -107,8 +109,10 @@ def calendario(mes, ano, estudio_name=None):
 
     return render_template(
         "calendario.html",
+        data_inicial=domingo_anterior,
         timedelta=timedelta,
         estudio=estudio,
+        hoje=hoje.day,
         agendamentos=agendamentos,
         get_month_name=get_month_name,
         mes=mes,
@@ -121,10 +125,37 @@ def calendario(mes, ano, estudio_name=None):
 
 
 @app.route("/agendar", methods=["GET", "POST"])
-def agendar(data):
+def agendar():
     estudio_id = request.args.get("estudio_id")
     estudio = Estudio.get_studio_by_id(estudio_id)
     if not estudio:
         return "Estúdio não encontrado", 404
+    if request.method == "POST":
+        data = request.form.get("data")
+        hora_inicio = request.form.get("hora_inicio")
+        hora_fim = request.form.get("hora_fim")
+
+        if not data or not hora_inicio or not hora_fim:
+            return "Data e hora são obrigatórios", 400
+        data_hora = f"{data} {hora_inicio}"
+        data_hora_fim = f"{data} {hora_fim}"
+
+        duracao = (
+            datetime.strptime(data_hora_fim, "%Y-%m-%d %H:%M")
+            - datetime.strptime(data_hora, "%Y-%m-%d %H:%M")
+        ).total_seconds() / 60
+        
+        agendamento = Agendamento(
+            estudio_id=estudio.id,
+            descricao=request.form.get("descricao", ""),
+            data_hora=datetime.strptime(data_hora, "%Y-%m-%d %H:%M"),
+            duracao=int(duracao),
+        )
+
+        agendamento.save()
+
+        data_hora = datetime.strptime(data_hora, "%Y-%m-%d %H:%M")
+
+        return redirect(f"/calendario/{estudio.id}/{data_hora.month}/{data_hora.year}")
 
     return render_template("agendar.html", estudio=estudio)

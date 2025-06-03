@@ -22,7 +22,7 @@ login_manager.init_app(app)
 # Importa e registra Blueprints (módulos da aplicação)
 from app.routes import routes
 
-# from app.adm_routes import adm_routes
+from app.adm_routes import adm_routes
 # from app.service import auth_service
 
 with app.app_context():

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Agendar Estúdio{% endblock %}
+
+{% block content %}
+<div class="agendar-container">
+    <h2>Agendar: {{ estudio.nome }}</h2>
+    <form method="post" action="{{ url_for('agendar') }}?estudio_id={{ estudio.id }}">
+        <div>
+            <label for="data">Data:</label>
+            <input type="date" id="data" name="data" required>
+        </div>
+        <div>
+            <label for="hora_inicio">Hora de Início:</label>
+            <input type="time" id="hora_inicio" name="hora_inicio" required>
+        </div>
+        <div>
+            <label for="hora_fim">Hora de Término:</label>
+            <input type="time" id="hora_fim" name="hora_fim" required>
+        </div>
+        <div>
+            <label for="responsavel">Responsável:</label>
+            <input type="text" id="responsavel" name="responsavel" required>
+        </div>
+        <div>
+            <label for="descricao">Descrição:</label>
+            <textarea id="descricao" name="descricao"></textarea>
+        </div>
+        <button type="submit">Agendar</button>
+    </form>
+</div>
+{% endblock %}

@@ -17,9 +17,9 @@
         <h2>Calendário</h2>
         <table class="calendario-table">
             <tr class="calendario-header calendario-header-mes">
-                <th colspan="2"><a href="{{url_for('calendario', estudio_name=estudio, mes=mes_anterior, ano=ano_anterior)}}" >{{get_month_name(mes_anterior)}}/{{ano_anterior}}</a></th>
+                <th colspan="2"><a href="{{url_for('calendario', estudio_id=estudio.id, mes=mes_anterior, ano=ano_anterior)}}" >{{get_month_name(mes_anterior)}}/{{ano_anterior}}</a></th>
                 <th colspan="3">{{get_month_name(mes)}}/{{ano}}</th>
-                <th colspan="2"><a href="{{url_for('calendario', estudio_name=estudio, mes=proximo_mes, ano=proximo_ano)}}" >{{get_month_name(proximo_mes)}}/{{proximo_ano}}</a></th>
+                <th colspan="2"><a href="{{url_for('calendario', estudio_id=estudio.id, mes=proximo_mes, ano=proximo_ano)}}" >{{get_month_name(proximo_mes)}}/{{proximo_ano}}</a></th>
                 
             <tr class="calendario-header">
                 <th>Domingo</th>
@@ -39,16 +39,16 @@
                             <div class={% if dia == hoje %}"card_day card_day-active"{% else %}"card_day"{% endif %}>
                                 <span class="card-day">{{ data }}</span>
                                 {% for agendamento in agendamentos %}
-                                    {% if agendamento.data.strftime('%d') == data %}
+                                    {% if agendamento.data_hora.strftime('%d') == data %}
                                         <div class="card_agendamento">
-                                            <span class="card_agendamento-time">{{ agendamento.hora.strftime('%H:%M') }}</span>
+                                            <span class="card_agendamento-time">{{ agendamento.data_hora.strftime('%H:%M') }}</span>
                                             <span class="card_agendamento-studio">{{ agendamento.estudio.nome }}</span>
                                             <span class="card_agendamento-client">{{ agendamento.cliente.nome }}</span>
                                         </div>
                                     {% endif %}
                                 {% endfor %}
                                 <div class="card_agendamento">
-                                    <a href="{{ url_for('agendar', data=data_inicial + timedelta(days=dia)) }}" class="card_agendamento-link">Agendar</a>
+                                    <a href="{{ url_for('agendar', data=data_inicial + timedelta(days=dia),  estudio_id=estudio.id) }}" class="card_agendamento-link">Agendar</a>
                             </div>
                         </td>
                         
