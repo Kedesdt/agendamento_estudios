@@ -3,7 +3,6 @@ from app.models.util import save, delete
 from sqlalchemy import or_, and_
 
 
-
 class Agendamento(db.Model):
     __tablename__ = "agendamentos"
 
@@ -28,9 +27,11 @@ class Agendamento(db.Model):
         data_hora_inicio,
         data_hora_final,
         estudio_id,
+        user_id,
         descricao,
         responsavel="Desconhecido",
     ):
+        self.user_id = user_id
         self.responsavel = responsavel
         self.data_hora_inicio = data_hora_inicio
         self.data_hora_final = data_hora_final
@@ -43,7 +44,24 @@ class Agendamento(db.Model):
         return (
             cls.query.filter(
                 cls.user_id == user_id,
-                cls.data_hora_inicio >= datainicial, cls.data_hora_inicio <= datafinal
+                cls.data_hora_inicio >= datainicial,
+                cls.data_hora_inicio <= datafinal,
+            )
+            .order_by(cls.data_hora_inicio)
+            .all()
+        )
+
+    @classmethod
+    def get_agendamentos_by_date_range_and_estudio(
+        cls, user_id, estudio_id, datainicial, datafinal
+    ):
+        """Retorna agendamentos dentro de um intervalo de datas."""
+        return (
+            cls.query.filter(
+                cls.user_id == user_id,
+                cls.estudio_id == estudio_id,
+                cls.data_hora_inicio >= datainicial,
+                cls.data_hora_inicio <= datafinal,
             )
             .order_by(cls.data_hora_inicio)
             .all()
@@ -51,7 +69,7 @@ class Agendamento(db.Model):
 
     @classmethod
     def get_agendamentos_by_estudio_data_e_hora(
-        cls, estudio_id, data_hora_inicio, data_hora_final
+        cls, user_id, estudio_id, data_hora_inicio, data_hora_final
     ):
         """Retorna agendamentos que realmente entram em conflito com a nova marcação."""
 
@@ -90,14 +108,11 @@ class Agendamento(db.Model):
             .order_by(cls.data_hora_inicio)
             .all()
         )
+
     @classmethod
     def get_agendamentos_by_user(cls, user_id):
         """Retorna agendamentos de um usuário específico."""
-        return (
-            cls.query.filter_by(user_id=user_id)
-            .order_by(cls.data_hora_inicio)
-            .all()
-        )
+        return cls.query.filter_by(user_id=user_id).order_by(cls.data_hora_inicio).all()
 
     def delete(self):
         """Remove a instância do banco de dados."""
@@ -105,7 +120,7 @@ class Agendamento(db.Model):
 
     def save(self):
         agendamentos = self.get_agendamentos_by_estudio_data_e_hora(
-            self.estudio_id, self.data_hora_inicio, self.data_hora_final
+            self.user_id, self.estudio_id, self.data_hora_inicio, self.data_hora_final
         )
         print(agendamentos)
         if agendamentos:

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block home %}
+    <a href="{{ url_for('home', username=user.username) }}" class="navbar-brand">Home</a>
+{% endblock %}
+
+{% block add_estudio %}
+    <a href="{{ url_for('add_estudio') }}" class="navbar-item">Add Estúdio</a>
+{% endblock %}
+
+{% block content %}
+    <h1>Meus Estúdios</h1>
+    <div class="calendario">
+        <h2>Lista de Estúdios</h2>
+        <table class="calendario-table">
+            <tr class="calendario-header">
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Ações</th>
+            </tr>
+            {% for estudio in estudios %}
+            <tr>
+                <td><strong>{{ estudio.nome }}</strong></td>
+                <td>{{ estudio.descricao or '-' }}</td>
+                <td>
+                    <!-- Exemplo de ação: deletar ou editar -->
+                    <a href="{{ url_for('delete_estudio', username=username, estudio_id=estudio.id) }}" class="card_agendamento-link card_agendamento-link-red" onclick="return confirm('Deseja realmente excluir este estúdio?');">Excluir</a>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if estudios|length == 0 %}
+            <tr>
+                <td colspan="3" style="text-align:center; color:#888;">Nenhum estúdio cadastrado.</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+{% endblock %}

@@ -10,7 +10,6 @@ from app.util.util import get_month_name
 from flask_login import current_user
 
 
-
 @app.route("/adm/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -21,6 +20,7 @@ def login():
         if authenticate(username, password):
             return redirect(url_for("home", username=username))
     return render_template("login.html")
+
 
 @app.route("/adm/register", methods=["GET", "POST"])
 def register():
@@ -46,12 +46,13 @@ def register():
 
     return render_template("register.html")
 
+
 @app.route("/", methods=["GET", "POST"])
 def index():
-    
+
     if current_user.is_authenticated:
         return redirect(url_for("home", username=current_user.username))
-    return redirect(url_for("login"))
+    return render_template("index.html")
 
     """error = None
     if request.method == "POST":
@@ -69,6 +70,7 @@ def index():
 
     return render_template("index.html", error=error)"""
 
+
 @app.route("/<username>/", methods=["GET", "POST"])
 def home(username):
 
@@ -76,17 +78,15 @@ def home(username):
 
     if user is None:
         return "Usuário não encontrado", 404
-    
+
     estudio = None
 
     estudio_id = request.args.get("estudio_id", None)
     ano = request.args.get("ano")
     mes = request.args.get("mes")
-    if estudio_id:
-        estudio = Estudio.get_studio_by_id(estudio_id)
 
-    if estudio is None:
-        estudio = user.estudios[0] if user.estudios else None
+    if estudio_id:
+        estudio = Estudio.get_studio_by_id_safe(user.id, estudio_id)
 
     estudios = user.estudios
 
@@ -125,17 +125,27 @@ def home(username):
         else primeiro_dia_do_mes.year
     )
 
-    agendamentos = Agendamento.get_agendamentos_by_date_range(
-        user_id=user.id,
-        datainicial=domingo_anterior,
-        datafinal=ultimo_dia_do_mes,
-    )
+    if not estudio:
+
+        agendamentos = Agendamento.get_agendamentos_by_date_range(
+            user_id=user.id,
+            datainicial=domingo_anterior,
+            datafinal=ultimo_dia_do_mes,
+        )
+    else:
+        agendamentos = Agendamento.get_agendamentos_by_date_range_and_estudio(
+            user_id=user.id,
+            estudio_id=estudio.id,
+            datainicial=domingo_anterior,
+            datafinal=ultimo_dia_do_mes,
+        )
 
     return render_template(
         "home.html",
         data_inicial=domingo_anterior,
         timedelta=timedelta,
         user=user,
+        username=username,
         estudio=estudio,
         estudios=estudios,
         hoje=hoje.strftime("%m%d"),
@@ -151,7 +161,10 @@ def home(username):
     )
 
 
-@app.route("/<username>/calendario/<int:estudio_id>/<int:mes>/<int:ano>", methods=["GET", "POST"])
+@app.route(
+    "/<username>/calendario/<int:estudio_id>/<int:mes>/<int:ano>",
+    methods=["GET", "POST"],
+)
 def calendario(mes, ano, estudio_id, username):
 
     user = User.get_user_by_username(username)
@@ -197,6 +210,7 @@ def calendario(mes, ano, estudio_id, username):
         timedelta=timedelta,
         estudio=estudio,
         user=user,
+        username=username,
         hoje=hoje.strftime("%m%d"),
         agendamentos=agendamentos,
         get_month_name=get_month_name,
@@ -209,7 +223,9 @@ def calendario(mes, ano, estudio_id, username):
     )
 
 
-@app.route("/<username>/calendario/dia/<int:dia>/<int:mes>/<int:ano>", methods=["GET", "POST"])
+@app.route(
+    "/<username>/calendario/dia/<int:dia>/<int:mes>/<int:ano>", methods=["GET", "POST"]
+)
 def calendario_dia(username, dia, mes, ano):
 
     user = User.get_user_by_username(username)
@@ -234,6 +250,7 @@ def calendario_dia(username, dia, mes, ano):
         timedelta=timedelta,
         estudio=estudio,
         user=user,
+        username=username,
         hoje=hoje.strftime("%m%d"),
         agendamentos=agendamentos,
     )
@@ -244,7 +261,8 @@ def agendar(username):
     user = User.get_user_by_username(username)
     if user is None:
         return "Usuário não encontrado", 404
-    estudios = Estudio.get_all_studios()
+
+    estudios = user.estudios
 
     if request.method == "POST":
         data = request.form.get("data")
@@ -275,5 +293,9 @@ def agendar(username):
             error = str(e)
 
     return render_template(
-        "agendar.html", estudios=estudios, error=error if "error" in locals() else None
+        "agendar.html",
+        username=username,
+        user=user,
+        estudios=estudios,
+        error=error if "error" in locals() else None,
     )

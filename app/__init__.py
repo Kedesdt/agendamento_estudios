@@ -27,8 +27,8 @@ login_manager.init_app(app)
 from app.routes import routes
 from app.adm_routes import adm_routes
 from app.routes import user_routes
+from app.routes import estudios_routes
 
- 
 
 with app.app_context():
     db.create_all()

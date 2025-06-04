@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block home %}
+    <a href="{{ url_for('index') }}" class="navbar-brand{% if request.endpoint == 'index' %} active{% endif %}">Início</a>
+{% endblock %}
+
+{% block login %}
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
+        <a href="{{ url_for('home', username=current_user.username) }}" class="navbar-item">Minha Agenda</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="navbar-item">Login</a>
+        <a href="{{ url_for('register') }}" class="navbar-item">Registrar</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <h1>Bem-vindo ao Sistema de Agendamento de Estúdios</h1>
+    <div class="calendario">
+        <h2>Sobre o sistema</h2>
+        <p style="font-size:1.1rem; margin-bottom: 18px;">
+            Este sistema foi desenvolvido para facilitar o <strong>agendamento de estúdios de gravação</strong> de forma simples, rápida e organizada.<br>
+            Com ele, você pode:
+        </p>
+        <ul style="font-size:1.08rem; margin-bottom: 18px; line-height:1.7;">
+            <li>Visualizar a disponibilidade dos estúdios em um calendário moderno e intuitivo;</li>
+            <li>Agendar horários para gravações de acordo com sua necessidade;</li>
+            <li>Gerenciar seus próprios estúdios e agendamentos;</li>
+            <li>Evitar conflitos de horários automaticamente;</li>
+            <li>Ter uma visão clara de todos os compromissos do mês.</li>
+        </ul>
+        <p style="font-size:1.08rem;">
+            Para começar, faça seu <a href="{{ url_for('login') }}" class="card_agendamento-link">login</a> ou <a href="{{ url_for('register') }}" class="register-link">registre-se</a>!<br>
+            Se já estiver autenticado, acesse sua agenda pelo menu acima.
+        </p>
+    </div>
+{% endblock %}

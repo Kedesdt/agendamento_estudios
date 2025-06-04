@@ -2,10 +2,37 @@
 
 {% block title %}Agendar Estúdio{% endblock %}
 
+{% block home %}
+    <a href="{{ url_for('home', username=username) }}" class="navbar-brand{% if request.endpoint == 'home' %} active{% endif %}">Home</a>
+{% endblock %}
+
+{% block agendar %}
+    <a href="{{ url_for('agendar', username=username) }}" class="navbar-item{% if request.endpoint == 'agendar' %} active{% endif %}">Agendar</a>
+{% endblock %}
+
+{% block add_estudio %}
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('add_estudio') }}" class="navbar-item{% if request.endpoint == 'add_estudio' %} active{% endif %}">Add Estúdio</a>
+    {% endif %}
+{% endblock %}
+
+{% block login %}
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="navbar-item">Login</a>
+    {% endif %}
+    {% if current_user.is_authenticated %}
+        <span class="navbar-item">Bem-vindo, {{ current_user.name }}!</span>
+    {% else %}
+        <span class="navbar-item">Você não está logado.</span>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="agendar-container">
     <h2>Agendar:</h2>
-    <form method="post" action="{{ url_for('agendar') }}">
+    <form method="post" action="{{ url_for('agendar', username=username) }}">
         <label for="estudio_id"><strong>Estúdio:</strong></label>
         <select name="estudio_id" id="estudio_id">
             {% for estudio in estudios %}
