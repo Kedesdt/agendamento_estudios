@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Usuário{% endblock %}
+
+{% block content %}
+<div class="agendar-container">
+    <h2>Editar Usuário</h2>
+    <form method="post">
+        <div>
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" value="{{ user.nome }}" required>
+        </div>
+        <div>
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}" required>
+        </div>
+        <div>
+            <label for="senha">Nova Senha:</label>
+            <input type="password" id="senha" name="senha" placeholder="Deixe em branco para não alterar">
+        </div>
+        <button type="submit">Salvar</button>
+    </form>
+</div>
+{% endblock %}

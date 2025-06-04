@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar{% endblock %}
+
+{% block content %}
+<div class="agendar-container">
+    <h2>Registrar</h2>
+    <form method="post" action="{{ url_for('register') }}">
+        <div>
+            <label for="name">Nome:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Registrar</button>
+    </form>
+    <a href="{{ url_for('login') }}" class="register-link">Já tem conta? Entrar</a>
+    {% if error %}
+        <p style="color: red; margin-top: 12px;">{{ error }}</p>
+    {% endif %}
+    {% if message %}
+        <p style="color: green; margin-top: 12px;">{{ message }}</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -27,7 +27,7 @@
                         </span>
                     {% endif %}
                     {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('delete', agendamento_id=agendamento.id, next=request.full_path) }}" class="card_agendamento-link card_agendamento-link-red">Apagar</a>
+                        <a href="{{ url_for('delete', username=current_user.username, agendamento_id=agendamento.id, next=request.full_path) }}" class="card_agendamento-link card_agendamento-link-red">Apagar</a>
                 
                     {% endif %}
                 </div>
@@ -35,7 +35,7 @@
         {% endif %}
     </div>
 
-    <a href="{{ url_for('home') }}" class="card_agendamento-link" style="margin-top:20px;">Voltar ao calendário</a>
+    <a href="{{ url_for('index') }}" class="card_agendamento-link" style="margin-top:20px;">Voltar ao calendário</a>
 {% endblock %}
 
 <style>

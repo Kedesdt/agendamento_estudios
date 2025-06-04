@@ -9,9 +9,12 @@
 
     <body>
         <div class="navbar">
-            <a href="{{ url_for('home') }}" class="navbar-brand{% if request.endpoint == 'home' %} active{% endif %}">Home</a>
-            <a href="{{ url_for('agendar') }}" class="navbar-item{% if request.endpoint == 'agendar' %} active{% endif %}">Agendar</a>
-            <a href="{{ url_for('add_estudio') }}" class="navbar-item{% if request.endpoint == 'add_estudio' %} active{% endif %}">Add Estudio</a>
+            {% block home %}
+            {% endblock %}
+            {% block agendar %}
+            {% endblock %}
+            {% block add_estudio %}
+            {% endblock %}
             {% block login %}
             {% endblock %}
             
@@ -26,5 +29,21 @@
             {% endblock %}
             <hr/>
         </div>
+
+        <div id="cookie-banner" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:#222; color:#fff; padding:16px; text-align:center; z-index:9999;">
+            Este site utiliza cookies para melhorar sua experiência. 
+            <button onclick="aceitarCookies()" style="margin-left:12px;">Aceitar</button>
+        </div>
+        <script>
+        function aceitarCookies() {
+            document.cookie = "cookies_aceitos=true; path=/; max-age=31536000";
+            document.getElementById('cookie-banner').style.display = 'none';
+        }
+        window.onload = function() {
+            if (!document.cookie.includes('cookies_aceitos=true')) {
+                document.getElementById('cookie-banner').style.display = 'block';
+            }
+        }
+        </script>
     </body>
 </html>

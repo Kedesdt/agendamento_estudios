@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Usuários{% endblock %}
+
+{% block content %}
+<div class="agendar-container">
+    <h2>Usuários</h2>
+    <a href="{{ url_for('add_usuario') }}" class="card_agendamento-link" style="margin-bottom: 16px; width: fit-content;">Adicionar Usuário</a>
+    <ul style="list-style: none; padding: 0;">
+        {% for usuario in usuarios %}
+        <li style="margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <strong>{{ usuario.nome }}</strong> ({{ usuario.username }})
+            <div style="margin-top: 8px;">
+                <a href="{{ url_for('edit_usuario', user_id=usuario.id) }}" class="card_agendamento-link">Editar</a>
+                <form method="post" action="{{ url_for('delete_usuario', user_id=usuario.id) }}" style="display:inline;">
+                    <button type="submit" class="card_agendamento-link card_agendamento-link-red" onclick="return confirm('Tem certeza que deseja excluir este usuário?');">Excluir</button>
+                </form>
+            </div>
+        </li>
+        {% else %}
+        <li>Nenhum usuário cadastrado.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,13 +1,15 @@
 from app import db
 from app.models.util import save, delete
-from datetime import datetime, timedelta
 from sqlalchemy import or_, and_
+
 
 
 class Agendamento(db.Model):
     __tablename__ = "agendamentos"
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user = db.relationship("User", back_populates="agendamentos")
     data_hora_inicio = db.Column(db.DateTime, nullable=False)
     data_hora_final = db.Column(db.DateTime, nullable=False)
     estudio_id = db.Column(db.Integer, db.ForeignKey("estudios.id"), nullable=False)
@@ -36,10 +38,11 @@ class Agendamento(db.Model):
         self.descricao = descricao
 
     @classmethod
-    def get_agendamentos_by_date_range(cls, datainicial, datafinal):
+    def get_agendamentos_by_date_range(cls, user_id, datainicial, datafinal):
         """Retorna agendamentos dentro de um intervalo de datas."""
         return (
             cls.query.filter(
+                cls.user_id == user_id,
                 cls.data_hora_inicio >= datainicial, cls.data_hora_inicio <= datafinal
             )
             .order_by(cls.data_hora_inicio)
@@ -84,6 +87,14 @@ class Agendamento(db.Model):
         """Retorna agendamentos de um estúdio específico."""
         return (
             cls.query.filter_by(estudio_id=estudio_id)
+            .order_by(cls.data_hora_inicio)
+            .all()
+        )
+    @classmethod
+    def get_agendamentos_by_user(cls, user_id):
+        """Retorna agendamentos de um usuário específico."""
+        return (
+            cls.query.filter_by(user_id=user_id)
             .order_by(cls.data_hora_inicio)
             .all()
         )

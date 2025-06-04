@@ -1,25 +1,94 @@
 from app import app
 from flask import render_template, request, redirect, url_for
+from app.service.auth_service import authenticate
 import time
 from datetime import datetime, timedelta
 from app.models.agendamento import Agendamento
 from app.models.estudio import Estudio
+from app.models.user import User
 from app.util.util import get_month_name
-from app.service.auth_service import current_user
+from flask_login import current_user
 
+
+
+@app.route("/adm/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # Aqui você deve implementar a lógica de autenticação
+        if authenticate(username, password):
+            return redirect(url_for("home", username=username))
+    return render_template("login.html")
+
+@app.route("/adm/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form.get("username")
+        email = request.form.get("email")
+        name = request.form.get("name")
+        password = request.form.get("password")
+
+        if not username or not email or not name or not password:
+            error = "Todos os campos são obrigatórios"
+            return render_template("register.html", error=error)
+
+        user = User(username=username, email=email, name=name)
+        user.set_password(password)
+
+        try:
+            user.save()
+            return redirect(url_for("login"))
+        except ValueError as e:
+            error = str(e)
+            return render_template("register.html", error=error)
+
+    return render_template("register.html")
 
 @app.route("/", methods=["GET", "POST"])
-def home():
+def index():
+    
+    if current_user.is_authenticated:
+        return redirect(url_for("home", username=current_user.username))
+    return redirect(url_for("login"))
 
-    estudio_id = request.args.get("estudio_id")
+    """error = None
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if not username or not password:
+            error = "Usuário e senha são obrigatórios"
+        else:
+            user = User.authenticate(username, password)
+            if user:
+                return redirect(url_for("home", username=user.username))
+            else:
+                error = "Usuário ou senha inválidos"
+
+    return render_template("index.html", error=error)"""
+
+@app.route("/<username>/", methods=["GET", "POST"])
+def home(username):
+
+    user = User.get_user_by_username(username)
+
+    if user is None:
+        return "Usuário não encontrado", 404
+    
+    estudio = None
+
+    estudio_id = request.args.get("estudio_id", None)
     ano = request.args.get("ano")
     mes = request.args.get("mes")
-    estudio = Estudio.get_studio_by_id(estudio_id)
+    if estudio_id:
+        estudio = Estudio.get_studio_by_id(estudio_id)
 
     if estudio is None:
-        estudio = Estudio.get_studio_by_id(1)
+        estudio = user.estudios[0] if user.estudios else None
 
-    estudios = Estudio.get_all_studios()
+    estudios = user.estudios
 
     hoje = datetime.now()
 
@@ -57,6 +126,7 @@ def home():
     )
 
     agendamentos = Agendamento.get_agendamentos_by_date_range(
+        user_id=user.id,
         datainicial=domingo_anterior,
         datafinal=ultimo_dia_do_mes,
     )
@@ -65,6 +135,7 @@ def home():
         "home.html",
         data_inicial=domingo_anterior,
         timedelta=timedelta,
+        user=user,
         estudio=estudio,
         estudios=estudios,
         hoje=hoje.strftime("%m%d"),
@@ -80,8 +151,12 @@ def home():
     )
 
 
-@app.route("/calendario/<int:estudio_id>/<int:mes>/<int:ano>", methods=["GET", "POST"])
-def calendario(mes, ano, estudio_id):
+@app.route("/<username>/calendario/<int:estudio_id>/<int:mes>/<int:ano>", methods=["GET", "POST"])
+def calendario(mes, ano, estudio_id, username):
+
+    user = User.get_user_by_username(username)
+    if user is None:
+        return "Usuário não encontrado", 404
 
     estudio_id = request.form.get("estudio_id", None)
     estudio = Estudio.get_studio_by_id(estudio_id)
@@ -121,6 +196,7 @@ def calendario(mes, ano, estudio_id):
         data_inicial=domingo_anterior,
         timedelta=timedelta,
         estudio=estudio,
+        user=user,
         hoje=hoje.strftime("%m%d"),
         agendamentos=agendamentos,
         get_month_name=get_month_name,
@@ -133,9 +209,12 @@ def calendario(mes, ano, estudio_id):
     )
 
 
-@app.route("/calendario/dia/<int:dia>/<int:mes>/<int:ano>", methods=["GET", "POST"])
-def calendario_dia(dia, mes, ano):
+@app.route("/<username>/calendario/dia/<int:dia>/<int:mes>/<int:ano>", methods=["GET", "POST"])
+def calendario_dia(username, dia, mes, ano):
 
+    user = User.get_user_by_username(username)
+    if user is None:
+        return "Usuário não encontrado", 404
     estudio_id = request.args.get("estudio_id", None)
     estudio = Estudio.get_studio_by_id(estudio_id)
 
@@ -144,6 +223,7 @@ def calendario_dia(dia, mes, ano):
     data_escolhida = datetime(ano, mes, dia)
 
     agendamentos = Agendamento.get_agendamentos_by_date_range(
+        user_id=user.id,
         datainicial=data_escolhida,
         datafinal=data_escolhida + timedelta(days=1),
     )
@@ -153,14 +233,17 @@ def calendario_dia(dia, mes, ano):
         data_escolhida=data_escolhida,
         timedelta=timedelta,
         estudio=estudio,
+        user=user,
         hoje=hoje.strftime("%m%d"),
         agendamentos=agendamentos,
     )
 
 
-@app.route("/agendar", methods=["GET", "POST"])
-def agendar():
-
+@app.route("/<username>/agendar", methods=["GET", "POST"])
+def agendar(username):
+    user = User.get_user_by_username(username)
+    if user is None:
+        return "Usuário não encontrado", 404
     estudios = Estudio.get_all_studios()
 
     if request.method == "POST":
@@ -178,6 +261,7 @@ def agendar():
 
         agendamento = Agendamento(
             estudio_id=estudio.id,
+            user_id=user.id,
             descricao=request.form.get("descricao", ""),
             data_hora_inicio=datetime.strptime(data_hora, "%Y-%m-%d %H:%M"),
             data_hora_final=datetime.strptime(data_hora_fim, "%Y-%m-%d %H:%M"),
@@ -186,7 +270,7 @@ def agendar():
 
         try:
             agendamento.save()
-            return redirect(url_for("home"))
+            return redirect(url_for("home", username=username))
         except ValueError as e:
             error = str(e)
 

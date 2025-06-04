@@ -2,6 +2,10 @@
 {% extends "base.html" %}
 
 {% block title %}Login{% endblock %}
+{% block home %}
+<a href="{{ url_for('login') }}" class="navbar-brand{% if request.endpoint == 'home' %} active{% endif %}">Home</a>
+{% endblock %}
+
 
 {% block content %}
 <div class="agendar-container">
@@ -17,6 +21,10 @@
         </div>
         <button type="submit">Entrar</button>
     </form>
+    <a href="{{ url_for('register') }}" class="register-link">Registrar</a>
+    {% if message %}
+        <p style="color: green; margin-top: 12px;">{{ message }}</p>
+    {% endif %}
     {% if error %}
         <p style="color: red; margin-top: 12px;">{{ error }}</p>
     {% endif %}

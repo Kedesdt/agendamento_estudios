@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Adicionar Usuário{% endblock %}
+
+{% block content %}
+<div class="agendar-container">
+    <h2>Adicionar Usuário</h2>
+    <form method="post">
+        <div>
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+        </div>
+        <div>
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" name="senha" required>
+        </div>
+        <button type="submit">Adicionar</button>
+    </form>
+    {% if error %}
+        <p style="color: red; margin-top: 12px;">{{ error }}</p>
+    {% endif %}
+</div>
+{% endblock %}
