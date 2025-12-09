@@ -1,6 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import os
+from dotenv import load_dotenv
 
+# Carrega variáveis de ambiente do arquivo .env
+load_dotenv()
 
 # Inicializa extensões
 db = SQLAlchemy()
@@ -9,8 +13,8 @@ db = SQLAlchemy()
 app = Flask(__name__)
 
 # Configurações básicas
-app.config["SECRET_KEY"] = "sua_chave_secreta"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "sua_chave_secreta_padrao")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI", "sqlite:///app.db")
 
 from app.models.user import User
 from app.models.agendamento import Agendamento
